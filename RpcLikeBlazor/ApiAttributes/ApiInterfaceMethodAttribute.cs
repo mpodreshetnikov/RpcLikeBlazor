@@ -14,7 +14,8 @@ namespace RpcLikeBlazor.ApiAttributes
         Delete,
         Head,
         Options,
-        Patch
+        Patch,
+        Misha
     }
 
     /// <summary>
