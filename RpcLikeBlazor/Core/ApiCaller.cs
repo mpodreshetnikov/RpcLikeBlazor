@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using RpcLikeBlazor.ApiAttributes;
+﻿using RpcLikeBlazor.ApiAttributes;
+using RpcLikeBlazor.ApiServiceSetup.Abstractions;
 using RpcLikeBlazor.Helpers;
 using System;
 using System.Collections.Generic;
@@ -9,12 +9,12 @@ using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace RpcLikeBlazor.Core
+namespace RpcLikeBlazor
 {
     /// <summary>
-    /// Can call the api methods.
+    /// Can call the Api Interface methods.
     /// </summary>
-    /// <typeparam name="TInterface">Api interface.</typeparam>
+    /// <typeparam name="TInterface">Api Interface.</typeparam>
     public class ApiCaller<TInterface>
             where TInterface : class
     {
@@ -23,24 +23,38 @@ namespace RpcLikeBlazor.Core
         private const string JsonContentMediaType = "application/json";
 
         private readonly HttpClient client;
+        private readonly IObjectConverter objectConverter;
 
-        internal ApiCaller(HttpClient client)
+        internal ApiCaller(HttpClient client, IObjectConverter objectConverter)
         {
             this.client = client;
+            this.objectConverter = objectConverter;
         }
 
+        /// <summary>
+        /// Call the Api Interface method.
+        /// </summary>
         public Task Call(Expression<Action<TInterface>> methodCall)
         {
+            ArgumentsHelpers.ThrowIfNull(methodCall, nameof(methodCall));
             return Call((MethodCallExpression)methodCall.Body);
         }
 
+        /// <summary>
+        /// Call the Api Interface method.
+        /// </summary>
         public Task<TOut> Call<TOut>(Expression<Func<TInterface, Task<TOut>>> methodCall)
         {
+            ArgumentsHelpers.ThrowIfNull(methodCall, nameof(methodCall));
             return Call<TOut>(methodCall.Body);
         }
 
+        /// <summary>
+        /// Call the Api Interface method.
+        /// </summary>
         public Task<TOut> Call<TOut>(Expression<Func<TInterface, TOut>> methodCall)
         {
+            ArgumentsHelpers.ThrowIfNull(methodCall, nameof(methodCall));
             return Call<TOut>(methodCall.Body);
         }
 
@@ -48,32 +62,7 @@ namespace RpcLikeBlazor.Core
         {
             var response = await Call((MethodCallExpression)methodExpression).ConfigureAwait(false);
             var resultString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return CastReturnedValue<TOut>(resultString);
-        }
-
-        private TOut CastReturnedValue<TOut>(string resultString)
-        {
-            var returnType = typeof(TOut);
-
-            if (resultString == null)
-            {
-                return default;
-            }
-            else if (returnType == typeof(DateTime))
-            {
-                object value = ParseHelpers.ParseDateTime(resultString);
-                return (TOut)value;
-            }
-            else if (returnType.IsEnum)
-            {
-                var value = Enum.Parse(returnType, resultString);
-                return (TOut)value;
-            }
-            else if (IsSimpleType(returnType))
-            {
-                return (TOut)Convert.ChangeType(resultString, returnType);
-            }
-            return JsonConvert.DeserializeObject<TOut>(resultString);
+            return objectConverter.ConvertToObject<TOut>(resultString);
         }
 
         private async Task<HttpResponseMessage> Call(MethodCallExpression method)
@@ -96,8 +85,8 @@ namespace RpcLikeBlazor.Core
             var methodArgsExpressions = methodCallExpression.Arguments.ToArray();
             var methodParametersNames = methodCallExpression.Method.GetParameters().Select(p => p.Name);
 
-            var apiInterfaceMethodAttribute = methodCallExpression.Method.GetCustomAttribute<ApiInterfaceMethodAttribute>();
-            var httpMethod = apiInterfaceMethodAttribute.Method;
+            var apiInterfaceMethodAttribute = methodCallExpression.Method.GetCustomAttribute<ApiHttpMethodAttribute>();
+            var httpMethod = apiInterfaceMethodAttribute.HttpMethod;
 
             // Get method and parameters.
             var (apiMethod, parameters) = GetApiMethodAndParameters(
@@ -124,13 +113,15 @@ namespace RpcLikeBlazor.Core
             {
                 var constValue = ReduceToConstant(argsValues[i]);
                 var typeOfValue = constValue.GetType();
-                if (IsSimpleType(typeOfValue))
+                var stringValue = objectConverter.ConvertToString(constValue);
+
+                if (TypeHelpers.IsSimpleType(typeOfValue))
                 {
-                    queryDict.Add(argsNames.ElementAt(i), constValue.ToString());
+                    queryDict.Add(argsNames.ElementAt(i), stringValue);
                 }
                 else if (string.IsNullOrEmpty(bodyString))
                 {
-                    bodyString = JsonConvert.SerializeObject(constValue);
+                    bodyString = stringValue;
                 }
                 else
                 {
@@ -163,47 +154,26 @@ namespace RpcLikeBlazor.Core
             return (apiMethod, parameters);
         }
 
-        private bool IsSimpleType(Type type)
-        {
-            var asPrimitives = new[]
-            {
-                    typeof(DateTime),
-                    typeof(Guid),
-                    typeof(decimal),
-                    typeof(string),
-                };
-
-            return type.IsPrimitive || type.IsEnum || asPrimitives.Contains(type);
-        }
-
         private string GetMethodName(MethodInfo methodInfo)
         {
-            var apiInterfaceRouteAttribute = typeof(TInterface).GetCustomAttribute<ApiInterfaceRouteAttribute>();
+            var apiInterfaceRouteAttribute = typeof(TInterface).GetCustomAttribute<ApiInterfaceAttribute>();
             var apiMethodRouteAttribute = methodInfo.GetCustomAttribute<ApiMethodRouteAttribute>();
 
-            var route = apiInterfaceRouteAttribute?.BaseRoute ?? GetRouteByInterfaceName(typeof(TInterface).Name);
+            var route = apiInterfaceRouteAttribute?.BaseRoute ??
+                ApiInterfaceConventionsHelpers.GetRouteByInterfaceName(typeof(TInterface).Name);
+
             if (apiMethodRouteAttribute != null)
             {
-                route += $"/{apiMethodRouteAttribute.Route}";
+                if (!string.IsNullOrWhiteSpace(apiMethodRouteAttribute.Route))
+                {
+                    route += $"/{apiMethodRouteAttribute.Route}";
+                }
             }
             else
             {
                 route += $"/{methodInfo.Name}";
             }
             return route;
-        }
-
-        private string GetRouteByInterfaceName(string name)
-        {
-            if (name.StartsWith('I'))
-            {
-                name = name.Remove(0, 1);
-            }
-            if (name.EndsWith("Api"))
-            {
-                name = name[0..^3];
-            }
-            return name;
         }
 
         private object ReduceToConstant(Expression expression)
