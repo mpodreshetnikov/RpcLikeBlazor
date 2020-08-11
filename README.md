@@ -77,7 +77,7 @@ public interface ITodoApi
 
 ## Getting Started
 
-First of all you need a Blazor WebAssembly project. It is the hardest thing to do :smile:. RpcLikeBlazor supports `netstandard2.1`.
+First of all, you need a Blazor WebAssembly project. It is the hardest thing to do :smile:. RpcLikeBlazor supports `netstandard2.1`.
 
 ### Installing
 
@@ -99,22 +99,22 @@ First of all you need a Blazor WebAssembly project. It is the hardest thing to d
   ```
 - ...or inject already configured for you `ApiCaller<ISomeApi>` (if you provided source for `ISomeApi` in `ApiSettings.ApiInterfacesSources`).
 
-For additional knowlegments download a sample from [GitHub](#other) and play with it.
+For additional knowledges download a sample from [GitHub](#other) and play with it.
 
 ### How to run sample
 
-You need to run client-side and server-side project. For both projects: go to folder with the `.csproj` file and run `dotnet run` command.
+You need to run the client-side and server-side projects. For both projects: go to a folder with the `.csproj` file and run `dotnet run` command.
 
 ### Additional info
 
 I recommend you to provide `ApiSettings.ApiInterfacesSources` for all the Api Interfaces. There are checks for different conventions and if you violate them exception will be thrown on the configuring stage.
 
-You can configure your own convertation of requests and responces parameters by providing `IObjectConverter` service in client-side app.
+You can configure your own converting of requests and responces parameters by providing `IObjectConverter` service in the client-side app.
 
 ### Conventions
 
-- There are maximum one complex (any `class` exclude `string`) parameter in Api Interface method. Complex parameter will be written in a request body and other parameters in a query string.
-- There are no equals by `name` and `HttpMethod` methods in Api Interface.
+- There is a maximum one complex (any `class` exclude `string`) parameter in an Api Interface method. The complex parameter will be written in a request body and other parameters in a query string.
+- There are no methods equals by their name and `ApiHttpMethod` attribute in Api Interface.
 
 ## License
 
