@@ -14,17 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
 
-      - name: Setup .NET Core @ Latest
-        uses: actions/setup-dotnet@v1
+      - name: Setup NuGet.exe for use with actions
+        uses: NuGet/setup-nuget@v1.0.2
         with:
-          source-url: https://nuget.pkg.github.com/MaximPodreshetnikov/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
+          nuget-api-key: ${{secrets.NUGET_API_KEY}}
 
       - name: Build solution and generate NuGet package
         run: |
           cd RpcLikeBlazor
-          dotnet pack -c Release -o out
+          nuget.exe pack .nuspec
 
-      - name: Push generated package to GitHub registry
-        run: dotnet nuget push ./RpcLikeBlazor/out/*.nupkg --skip-duplicate --no-symbols true
+      - name: Push generated package
+        run: nuget push *.nupkg -Source https://api.nuget.org/v3/index.json
