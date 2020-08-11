@@ -21,5 +21,10 @@ jobs:
 
       - name: Build solution and generate NuGet package
         run: |
+          echo "start nuspec creating"
           cd RpcLikeBlazor
-          nuget.exe pack .nuspec
+          nuget pack .nuspec
+          echo "nuspec created"
+          
+      - name: Push generated package
+        run: nuget push *.nupkg -Source https://api.nuget.org/v3/index.json
