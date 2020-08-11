@@ -33,7 +33,6 @@ TestResult.xml
 # .NET Core
 project.lock.json
 project.fragment.lock.json
-artifacts/
 
 # Files built by Visual Studio
 *_i.c
