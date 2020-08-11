@@ -1,0 +1,109 @@
+﻿@page "/"
+
+<h1>Hello, User!</h1>
+
+<h4>
+    Welcome to my RpcLikeBlazor sample.
+    <br />
+    This is a simple Task Manager.
+</h4>
+
+<EditForm Model=TodoModel OnValidSubmit=CreateTodo>
+    <div style="display: inline-block;">
+        <label for="@TodoModel.Title" style="display: block;">Title</label>
+        <InputText @bind-Value=TodoModel.Title />
+    </div>
+    <div style="display: inline-block;">
+        <label for="@TodoModel.Description" style="display: block;">Description</label>
+        <InputText @bind-Value=TodoModel.Description />
+    </div>
+    <div style="display: inline-block;">
+        <label for="@TodoModel.IsCompleted" style="display: block;">Is completed?</label>
+        <div style="text-align: center;">
+            <InputCheckbox @bind-Value=TodoModel.IsCompleted />
+        </div>
+    </div>
+    <div style="display: inline-block;">
+        <button type="submit">Create task!</button>
+    </div>
+</EditForm>
+
+<div style="margin-top: 20px;">
+    <table>
+        <thead>
+            <tr>
+                <td width="200px">Title</td>
+                <td width="350px">Description</td>
+                <td width="300px">Completed</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var todo in Todos)
+            {
+                <tr>
+                    <td>@todo.Title</td>
+                    <td>@todo.Description</td>
+                    <td>
+                        <input type="checkbox" checked=@todo.IsCompleted @onchange=@MarkTodoCallbackFactory(todo) />
+                        <button @onclick=DeleteTodoCallbackFactory(todo)>Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@code {
+    [Inject]
+    ApiCaller<ITodoApi> TodoApi { get; set; }
+
+    private IList<Todo> Todos = new List<Todo>();
+
+    private Todo TodoModel = new Todo();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await UpdateTodos();
+    }
+
+    private async Task UpdateTodos()
+    {
+        Todos = (await TodoApi.Call(a => a.GetTodos())).ToList();
+        StateHasChanged();
+    }
+
+    private Action<ChangeEventArgs> MarkTodoCallbackFactory(Todo todo)
+    {
+        return async args =>
+        {
+            var success = await TodoApi.Call(a => a.MarkTask(todo.Id, (bool)args.Value));
+            if (success)
+            {
+                todo.IsCompleted = (bool)args.Value;
+                StateHasChanged();
+            }
+        };
+    }
+
+    private async Task CreateTodo()
+    {
+        var todo = await TodoApi.Call(a => a.AddTodo(TodoModel));
+        if (todo != null)
+        {
+            Todos.Add(todo);
+            StateHasChanged();
+        }
+    }
+
+    private Action DeleteTodoCallbackFactory(Todo todo)
+    {
+        return async () =>
+        {
+            var success = await TodoApi.Call(a => a.DeleteTodo(todo.Id));
+            if (success)
+            {
+                Todos.Remove(todo);
+                StateHasChanged();
+            }
+        };
+    }
+}
