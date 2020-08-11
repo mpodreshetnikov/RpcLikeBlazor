@@ -19,3 +19,7 @@ jobs:
         with:
           nuget-api-key: ${{secrets.NUGET_API_KEY}}
 
+      - name: Build solution and generate NuGet package
+        run: |
+          cd RpcLikeBlazor
+          nuget.exe pack .nuspec
