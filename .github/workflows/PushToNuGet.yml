@@ -1,4 +1,4 @@
-name: Push to NuGet
+name: Update NuGet package
 
 on:
   push:
@@ -14,17 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1
         
-      - name: Setup NuGet.exe for use with actions
+      - name: Setup nuget
         uses: NuGet/setup-nuget@v1.0.2
         with:
           nuget-api-key: ${{secrets.NUGET_API_KEY}}
 
-      - name: Build solution and generate NuGet package
+      - name: Generate package and push
         run: |
-          echo "start nuspec creating"
+          echo "package creating..."
           cd RpcLikeBlazor
           nuget pack .nuspec
-          echo "nuspec created"
-          
-      - name: Push generated package
-        run: nuget push *.nupkg -Source https://api.nuget.org/v3/index.json
+          echo "package created"
+          echo "pushing package..."
+          nuget push *.nupkg -Source https://api.nuget.org/v3/index.json
+          echo "package pushed"
