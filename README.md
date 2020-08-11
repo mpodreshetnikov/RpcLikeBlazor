@@ -89,7 +89,7 @@ First of all, you need a Blazor WebAssembly project. It is the hardest thing to 
   ```C#
   builder.UseRpcLikeBlazor();
   ```
-  ...in `Program.cs` file if you want to inject `ApiService`. And if you want to inject `ApiCaller` (see [pros](#pros)) then provide `ApiSettings` with `ApiInterfacesSources` configured.
+  ...in `Program.cs` file if you want to inject `ApiService`. And if you want to inject `ApiCaller` (see [pros](#pros)) then provide `ApiServiceSettings` with `ApiInterfacesSources` configured.
 
 ### Using
 
@@ -97,7 +97,7 @@ First of all, you need a Blazor WebAssembly project. It is the hardest thing to 
   ```C#
   ApiService.Of<ISomeApi>.Call(api => api.ApiMethod());
   ```
-- ...or inject already configured for you `ApiCaller<ISomeApi>` (if you provided source for `ISomeApi` in `ApiSettings.ApiInterfacesSources`).
+- ...or inject already configured for you `ApiCaller<ISomeApi>` (if you provided source for `ISomeApi` in `ApiServiceSettings.ApiInterfacesSources`).
 
 For additional knowledges download a sample from [GitHub](#other) and play with it.
 
@@ -107,13 +107,13 @@ You need to run the client-side and server-side projects. For both projects: go 
 
 ### Additional info
 
-I recommend you to provide `ApiSettings.ApiInterfacesSources` for all the Api Interfaces. There are checks for different conventions and if you violate them exception will be thrown on the configuring stage.
+I recommend you to provide `ApiServiceSettings.ApiInterfacesSources` for all the Api Interfaces. There are checks for different conventions and if you violate them human readable exception will be thrown on the configuring stage.
 
 You can configure your own converting of requests and responces parameters by providing `IObjectConverter` service in the client-side app.
 
 ### Conventions
 
-- There is a maximum one complex (any `class` exclude `string`) parameter in an Api Interface method. The complex parameter will be written in a request body and other parameters in a query string.
+- There is a maximum one complex (any `class` or complex `struct` exclude `enum`, `string`, `DateTime`, `Guid` and `double`) parameter in an Api Interface method. The complex parameter will be written in a request body and other parameters in a query string.
 - There are no methods equals by their name and `ApiHttpMethod` attribute in Api Interface.
 
 ## License
