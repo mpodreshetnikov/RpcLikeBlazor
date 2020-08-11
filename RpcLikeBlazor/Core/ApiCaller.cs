@@ -85,7 +85,8 @@ namespace RpcLikeBlazor
             var methodArgsExpressions = methodCallExpression.Arguments.ToArray();
             var methodParametersNames = methodCallExpression.Method.GetParameters().Select(p => p.Name);
 
-            var apiInterfaceMethodAttribute = methodCallExpression.Method.GetCustomAttribute<ApiHttpMethodAttribute>();
+            var apiInterfaceMethodAttribute = methodCallExpression.Method.GetCustomAttribute<ApiHttpMethodAttribute>()
+                ?? new ApiHttpMethodAttribute(Method.Get);
             var httpMethod = apiInterfaceMethodAttribute.HttpMethod;
 
             // Get method and parameters.

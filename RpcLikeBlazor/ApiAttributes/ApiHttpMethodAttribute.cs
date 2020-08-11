@@ -19,6 +19,7 @@ namespace RpcLikeBlazor.ApiAttributes
 
     /// <summary>
     /// Attribute for Api Interface method describing HTTP method.
+    /// HttpGet method will be used if this attribute is not provided.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public class ApiHttpMethodAttribute : Attribute
