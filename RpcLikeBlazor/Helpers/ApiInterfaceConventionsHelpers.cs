@@ -25,8 +25,22 @@ namespace RpcLikeBlazor.Helpers
         {
             var throwException = settings.OnApiInterfaceConventionViolated == OnApiInterfaceConventionViolated.ThrowException;
 
-            return CheckForMaxOneComplexParameter(apiInterface, throwException)
+            return CheckForInterfaceType(apiInterface, throwException)
+                && CheckForMaxOneComplexParameter(apiInterface, throwException)
                 && CheckForNameDifference(apiInterface, throwException);
+        }
+
+        private static bool CheckForInterfaceType(Type apiInterface, bool throwException)
+        {
+            if (!apiInterface.IsInterface)
+            {
+                if (!throwException)
+                {
+                    return false;
+                }
+                throw new Exceptions.ApiConventionExceptions.NotInterfaceException(apiInterface);
+            }
+            return true;
         }
 
         private static bool CheckForMaxOneComplexParameter(Type apiInterface, bool throwException)
