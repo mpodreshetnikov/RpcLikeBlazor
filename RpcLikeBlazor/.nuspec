@@ -7,11 +7,13 @@
     <title>RpcLikeBlazor</title>
     <authors>MaximPodreshetnikov</authors>
     <owners>MaximPodreshetnikov</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
     <icon>icon.png</icon>
     <projectUrl>https://github.com/mpodreshetnikov/RpcLikeBlazor</projectUrl>
     <description>RpcLikeBlazor is a lightweight library for method like calling server-side ASP.NET Api from client-side app.</description>
     <tags>ASP.NET Blazor RPC API Core</tags>
+    <copyright>Copyright 2020</copyright>
   </metadata>
   <files>
     <file src="icon.png" target="" />
