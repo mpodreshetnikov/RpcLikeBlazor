@@ -23,7 +23,7 @@ jobs:
         run: |
           echo "package creating..."
           cd RpcLikeBlazor
-          nuget pack .nuspec
+          nuget pack RpcLikeBlazor.csproj -IncludeReferencedProjects -Build -Properties Configuration=Release
           echo "package created"
           echo "pushing package..."
           nuget push *.nupkg -Source https://api.nuget.org/v3/index.json
