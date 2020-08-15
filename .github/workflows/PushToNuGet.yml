@@ -21,10 +21,10 @@ jobs:
 
       - name: Generate package and push
         run: |
+          echo "package restoring..."
+          nuget restore
           echo "package creating..."
           cd RpcLikeBlazor
           nuget pack RpcLikeBlazor.csproj -IncludeReferencedProjects -Build -Properties Configuration=Release
-          echo "package created"
           echo "pushing package..."
           nuget push *.nupkg -Source https://api.nuget.org/v3/index.json
-          echo "package pushed"
