@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using RpcLikeBlazor.ApiServiceSetup.Abstractions;
 using RpcLikeBlazor.ApiServiceSetup.Implementations.ObjectConverters;
-using RpcLikeBlazor.Helpers;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -44,7 +43,7 @@ namespace RpcLikeBlazor.ApiServiceSetup
 
             foreach (var apiInterface in settings.ApiInterfacesSources.SelectMany(ai => ai.ApiInterfaces).ToList())
             {
-                if (!ApiInterfaceConventionsHelpers.CheckForConventions(apiInterface, settings))
+                if (!ApiConventionManager.CheckForConventions(apiInterface, settings))
                 {
                     continue;
                 }
