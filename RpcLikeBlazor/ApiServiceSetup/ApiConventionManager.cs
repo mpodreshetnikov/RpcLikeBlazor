@@ -9,7 +9,7 @@ namespace RpcLikeBlazor.ApiServiceSetup
 {
     internal static class ApiConventionManager
     {
-        private static IList<Type> conventionCheckPassedTypes = new List<Type>();
+        private static readonly IList<Type> conventionCheckPassedTypes = new List<Type>();
 
         public static bool CheckForConventions(Type apiInterface, ApiServiceSettings settings)
         {
