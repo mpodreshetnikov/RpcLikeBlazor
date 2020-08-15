@@ -1,4 +1,5 @@
-﻿using RpcLikeBlazor.ApiServiceSetup.Abstractions;
+﻿using RpcLikeBlazor.ApiServiceSetup;
+using RpcLikeBlazor.ApiServiceSetup.Abstractions;
 using System.Net.Http;
 
 namespace RpcLikeBlazor
@@ -18,13 +19,15 @@ namespace RpcLikeBlazor
         }
 
         /// <summary>
-        /// Create <see cref="ApiCaller{TInterface}"/>.
+        /// Create <see cref="ApiCaller{TInterface}"/> if conventions checks passed else returns null.
         /// </summary>
         /// <typeparam name="TInterface">Api Interface.</typeparam>
         public ApiCaller<TInterface> Of<TInterface>()
             where TInterface : class
         {
-            return new ApiCaller<TInterface>(client, objectConverter);
+            return ApiConventionManager.CheckForConventions(typeof(TInterface), null)
+                ? new ApiCaller<TInterface>(client, objectConverter)
+                : null;
         }
     }
 }
