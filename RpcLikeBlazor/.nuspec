@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
-  <metadata>    
+  <metadata>
     <id>RpcLikeBlazor</id>
-    <version>0.2.2</version>
-    <releaseNotes></releaseNotes>
+    <version>0.2.2-fix</version>
+    <releaseNotes>Fix deploy, now files included.</releaseNotes>
     <title>RpcLikeBlazor</title>
     <authors>MaximPodreshetnikov</authors>
     <owners>MaximPodreshetnikov</owners>
@@ -12,8 +12,12 @@
     <icon>icon.png</icon>
     <projectUrl>https://github.com/mpodreshetnikov/RpcLikeBlazor</projectUrl>
     <description>RpcLikeBlazor is a lightweight library for method like calling server-side ASP.NET Api from client-side app.</description>
-    <tags>ASP.NET Blazor RPC API Core</tags>
+    <tags>asp.net blazor rpc</tags>
     <copyright>Copyright 2020</copyright>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="12.0.3" />
+      <dependency id="Microsoft.AspNetCore.Components.WebAssembly" version="3.2.1" />
+    </dependencies>
   </metadata>
   <files>
     <file src="icon.png" target="" />
