@@ -67,7 +67,7 @@
 
     private async Task UpdateTodos()
     {
-        Todos = (await TodoApi.Call(a => a.GetTodos())).ToList();
+        Todos = (await TodoApi.CallAsync(a => a.GetTodos())).ToList();
         StateHasChanged();
     }
 
@@ -75,7 +75,7 @@
     {
         return async args =>
         {
-            var success = await TodoApi.Call(a => a.MarkTask(todo.Id, (bool)args.Value));
+            var success = await TodoApi.CallAsync(a => a.MarkTask(todo.Id, (bool)args.Value));
             if (success)
             {
                 todo.IsCompleted = (bool)args.Value;
@@ -86,7 +86,7 @@
 
     private async Task CreateTodo()
     {
-        var todo = await TodoApi.Call(a => a.AddTodo(TodoModel));
+        var todo = await TodoApi.CallAsync(a => a.AddTodo(TodoModel));
         if (todo != null)
         {
             Todos.Add(todo);
@@ -98,7 +98,7 @@
     {
         return async () =>
         {
-            var success = await TodoApi.Call(a => a.DeleteTodo(todo.Id));
+            var success = await TodoApi.CallAsync(a => a.DeleteTodo(todo.Id));
             if (success)
             {
                 Todos.Remove(todo);

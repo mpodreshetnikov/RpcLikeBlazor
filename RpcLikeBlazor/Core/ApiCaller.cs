@@ -34,38 +34,41 @@ namespace RpcLikeBlazor
         /// <summary>
         /// Call the Api Interface method.
         /// </summary>
-        public Task Call(Expression<Action<TInterface>> methodCall)
+        public Task CallAsync(Expression<Action<TInterface>> methodCall)
         {
             ArgumentsHelpers.ThrowIfNull(methodCall, nameof(methodCall));
-            return Call((MethodCallExpression)methodCall.Body);
+            return CallAsync((MethodCallExpression)methodCall.Body);
         }
 
         /// <summary>
         /// Call the Api Interface method.
         /// </summary>
-        public Task<TOut> Call<TOut>(Expression<Func<TInterface, Task<TOut>>> methodCall)
+        public Task<TOut> CallAsync<TOut>(Expression<Func<TInterface, Task<TOut>>> methodCall)
         {
             ArgumentsHelpers.ThrowIfNull(methodCall, nameof(methodCall));
-            return Call<TOut>(methodCall.Body);
+            return CallAsync<TOut>(methodCall.Body);
         }
 
         /// <summary>
         /// Call the Api Interface method.
         /// </summary>
-        public Task<TOut> Call<TOut>(Expression<Func<TInterface, TOut>> methodCall)
+        public Task<TOut> CallAsync<TOut>(Expression<Func<TInterface, TOut>> methodCall)
         {
             ArgumentsHelpers.ThrowIfNull(methodCall, nameof(methodCall));
-            return Call<TOut>(methodCall.Body);
+            return CallAsync<TOut>(methodCall.Body);
         }
 
-        private async Task<TOut> Call<TOut>(Expression methodExpression)
+        private async Task<TOut> CallAsync<TOut>(Expression methodExpression)
         {
-            var response = await Call((MethodCallExpression)methodExpression).ConfigureAwait(false);
+            var response = await CallAsync((MethodCallExpression)methodExpression).ConfigureAwait(false);
             var resultString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return objectConverter.ConvertToObject<TOut>(resultString);
         }
 
-        private async Task<HttpResponseMessage> Call(MethodCallExpression method)
+        /// <summary>
+        /// Basic call method.
+        /// </summary>
+        private async Task<HttpResponseMessage> CallAsync(MethodCallExpression method)
         {
             // Get request method.
             var requestMethod = GetRequestMethodCallExpression(method);
@@ -84,6 +87,12 @@ namespace RpcLikeBlazor
             var methodName = GetMethodName(methodCallExpression.Method);
             var methodArgsExpressions = methodCallExpression.Arguments.ToArray();
             var methodParametersNames = methodCallExpression.Method.GetParameters().Select(p => p.Name);
+
+            // Only current ApiInterface methods are possible.
+            if (typeof(TInterface).GetMethods().SingleOrDefault(m => m == methodCallExpression.Method) == null)
+            {
+                throw new ArgumentException("Only methods of called ApiInterface are supported.");
+            }
 
             var apiInterfaceMethodAttribute = methodCallExpression.Method.GetCustomAttribute<ApiHttpMethodAttribute>()
                 ?? new ApiHttpMethodAttribute(Method.Get);
