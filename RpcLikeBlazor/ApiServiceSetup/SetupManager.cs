@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using RpcLikeBlazor.ApiServiceSetup.Abstractions;
 using RpcLikeBlazor.ApiServiceSetup.Implementations.ObjectConverters;
+using RpcLikeBlazor.Core.Middlewares;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -22,6 +23,7 @@ namespace RpcLikeBlazor.ApiServiceSetup
 
             SetupHttpClient(builder, settings);
             SetupApiInterfacesInstances(builder, settings);
+            settings?.MiddlewaresSetup(new Middlewares());
         }
 
         private static void SetupHttpClient(WebAssemblyHostBuilder builder, ApiServiceSettings settings)

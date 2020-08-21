@@ -1,5 +1,6 @@
 ﻿using RpcLikeBlazor.ApiAttributes;
 using RpcLikeBlazor.ApiServiceSetup.Abstractions;
+using RpcLikeBlazor.Core.Middlewares;
 using RpcLikeBlazor.Helpers;
 using System;
 using System.Collections.Generic;
@@ -61,6 +62,10 @@ namespace RpcLikeBlazor
         private async Task<TOut> CallAsync<TOut>(Expression methodExpression)
         {
             var response = await CallAsync((MethodCallExpression)methodExpression).ConfigureAwait(false);
+            if (response == null)
+            {
+                return default;
+            }
             var resultString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             return objectConverter.ConvertToObject<TOut>(resultString);
         }
@@ -70,14 +75,25 @@ namespace RpcLikeBlazor
         /// </summary>
         private async Task<HttpResponseMessage> CallAsync(MethodCallExpression method)
         {
+            MiddlewaresManager.Request(method);
+
             // Get request method.
             var requestMethod = GetRequestMethodCallExpression(method);
 
             // Run request.
             var task = (Task<HttpResponseMessage>)Expression.Lambda(requestMethod).Compile().DynamicInvoke();
-            var response = await task.ConfigureAwait(false);
+            var response = default(HttpResponseMessage);
+            try
+            {
+                response = await task.ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                MiddlewaresManager.ResponseSendingException(e);
+            }
 
-            response.EnsureSuccessStatusCode();
+            MiddlewaresManager.Response(response);
+
             return response;
         }
 

@@ -1,4 +1,6 @@
 ﻿using RpcLikeBlazor.ApiServiceSetup.Abstractions;
+using RpcLikeBlazor.Core.Middlewares;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 
@@ -40,5 +42,11 @@ namespace RpcLikeBlazor.ApiServiceSetup
         /// Behavior if Api Interface violate convention.
         /// </summary>
         public OnApiInterfaceConventionViolated OnApiInterfaceConventionViolated { get; set; }
+
+        /// <summary>
+        /// Action that allow to setup middlewares.
+        /// </summary>
+        /// <remarks>If no one on-exception middleware return false then exception will be thrown.</remarks>
+        public Action<Middlewares> MiddlewaresSetup { get; set; }
     }
 }
