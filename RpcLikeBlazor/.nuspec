@@ -2,8 +2,8 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>RpcLikeBlazor</id>
-    <version>0.2.3</version>
-    <releaseNotes>Fix deploy, now files included.</releaseNotes>
+    <version>0.2.4</version>
+    <releaseNotes></releaseNotes>
     <title>RpcLikeBlazor</title>
     <authors>MaximPodreshetnikov</authors>
     <owners>MaximPodreshetnikov</owners>
@@ -16,7 +16,7 @@
     <copyright>Copyright 2020</copyright>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="12.0.3" />
-      <dependency id="Microsoft.AspNetCore.Components.WebAssembly" version="3.2.1" />
+      <dependency id="Microsoft.AspNetCore.Components.WebAssembly" version="3.2.0" />
     </dependencies>
   </metadata>
   <files>
