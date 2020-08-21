@@ -1,19 +1,19 @@
 # RpcLikeBlazor
 
-RpcLikeBlazor is a lightweight library for method like calling  server-side ASP.NET Api from client-side app.
+RpcLikeBlazor is a lightweight library for method like calling  server-side ASP.NET Core Api from client-side app.
+
 > If something allow to use C# code in our app then we can make some magic :wink:.
 
-## Pros
-<a name="pros"></a>
-
-<details>
-<summary>Give you a great experience</summary>
-
+It wraps your api calls. The `standard way`:
+```C#
+Http.GetFromJsonAsync<SomeReturnType>("SomeApiRoute");
+```
+The `RpcLikeBlazor way`:
 ```C#
 SomeApi.Call(api => api.ApiMethod());
 ```
-</details>
-
+## Pros
+<a name="pros"></a>
 <details>
 <summary>Easy to use</summary>
 
